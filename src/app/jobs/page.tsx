@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import './jobs.css';
 
 export default function MyJobs() {
@@ -54,17 +53,8 @@ export default function MyJobs() {
 
   return (
     <div className="jobs-container">
-      <nav className="dashboard-nav">
-        <div className="nav-left">
-          <h2>JobTracker AI</h2>
-          <div className="nav-links">
-            <Link href="/dashboard" className="nav-item">Add Job</Link>
-            <Link href="/jobs" className="nav-item active">My Jobs</Link>
-          </div>
-        </div>
-        <button className="logout-btn" onClick={() => { localStorage.clear(); router.push('/login'); }}>Logout</button>
-      </nav>
-
+      {/* Redundant nav removed - now handled by global Navbar component */}
+      
       <main className="jobs-content">
         <header className="jobs-header">
           <h1>My Applications</h1>

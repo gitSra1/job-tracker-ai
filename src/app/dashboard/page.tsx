@@ -9,12 +9,12 @@ export default function Dashboard() {
   const [company, setCompany] = useState('');
   const [url, setUrl] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState(''); // Default is empty ('None')
+  const [status, setStatus] = useState(''); 
   const [resume, setResume] = useState<File | null>(null);
   const [coverLetter, setCoverLetter] = useState<File | null>(null);
   const [setReminder, setSetReminder] = useState(false);
   
-  // 2. Data & Navigation State
+  // 2. Data State
   const [jobs, setJobs] = useState([]);
   const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
@@ -39,12 +39,12 @@ export default function Dashboard() {
     }
   };
 
-  // 4. Submit Logic using FormData to handle text and files
+  // 4. Submit Logic
   const handleSaveJob = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!status) {
-      alert("Please select a status (Applied or Apply in Future)");
+      alert("Please select a status");
       return;
     }
 
@@ -57,38 +57,30 @@ export default function Dashboard() {
     formData.append('user_id', userId || '');
     formData.append('reminder_enabled', String(setReminder));
     
-    // Append files for the Backend Multer fields
     if (resume) formData.append('resume', resume);
     if (coverLetter) formData.append('coverLetter', coverLetter);
 
     try {
       const response = await fetch('http://localhost:5000/api/jobs', {
         method: 'POST',
-        // Browser sets multipart/form-data header automatically
         body: formData, 
       });
 
       if (response.ok) {
-        alert("Application saved successfully!");
-        // Reset Form
+        alert("Application saved!");
         setRole(''); setCompany(''); setUrl(''); setDescription('');
         setStatus(''); setResume(null); setCoverLetter(null); setSetReminder(false);
         fetchUserJobs(userId!); 
       }
     } catch (err) {
-      alert("Error: Connection to backend failed.");
+      alert("Connection to backend failed.");
     }
   };
 
   return (
     <div className="dashboard-container">
-      <nav className="dashboard-nav">
-        <h2>JobTracker AI</h2>
-        <button className="logout-btn" onClick={() => { localStorage.clear(); router.push('/login'); }}>
-          Logout
-        </button>
-      </nav>
-
+      {/* Navbar is now handled by the global Layout/Navbar component */}
+      
       <main className="dashboard-grid">
         <section className="form-section">
           <h2>Track New Opportunity</h2>
@@ -117,18 +109,15 @@ export default function Dashboard() {
               <option value="Applied">Applied</option>
             </select>
 
-            {/* Conditional Logic: Applied Status */}
             {status === 'Applied' && (
               <div className="upload-group">
                 <label htmlFor="resume">Upload Resume</label>
                 <input id="resume" type="file" onChange={(e) => setResume(e.target.files?.[0] || null)} />
-                
                 <label htmlFor="coverLetter">Upload Cover Letter (Optional)</label>
                 <input id="coverLetter" type="file" onChange={(e) => setCoverLetter(e.target.files?.[0] || null)} />
               </div>
             )}
 
-            {/* Conditional Logic: Reminder Status */}
             {status === 'Pending' && (
               <div className="reminder-group">
                 <label>
