@@ -1,0 +1,79 @@
+.jobs-container {
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.jobs-content {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.jobs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.filter-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-wrapper select {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+}
+
+.jobs-table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  overflow: hidden;
+}
+
+.jobs-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.jobs-table th {
+  background: #f1f5f9;
+  padding: 1rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.jobs-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.status-pill {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: #e2e8f0;
+}
+
+/* Status Specific Colors */
+.status-row.applied .status-pill { background: #dbeafe; color: #1e40af; }
+.status-row.interviewing .status-pill { background: #fef9c3; color: #854d0e; }
+.status-row.rejected .status-pill { background: #fee2e2; color: #991b1b; }
+.status-row.assessment .status-pill { background: #f0fdf4; color: #166534; }
+
+.inline-select {
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+.active {
+  border-bottom: 2px solid #3b82f6;
+  color: white !important;
+}
