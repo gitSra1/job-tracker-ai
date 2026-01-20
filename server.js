@@ -12,10 +12,7 @@ const app = express();
 
 // --- 1. Middleware & Cloud Setup ---
 app.use(cors({
-  // This tells the browser: "Yes, I trust this Vercel site"
-  origin: 'https://job-tracker-ai-virid.vercel.app', 
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: true, 
   credentials: true
 }));
 app.options('*', cors());
