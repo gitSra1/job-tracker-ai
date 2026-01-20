@@ -61,7 +61,7 @@ export default function Dashboard() {
     if (coverLetter) formData.append('coverLetter', coverLetter);
 
     try {
-      const response = await fetch('http://localhost:5000/api/jobs', {
+      const response = await fetch('https://job-tracker-ai.onrender.com', {
         method: 'POST',
         body: formData, 
       });
