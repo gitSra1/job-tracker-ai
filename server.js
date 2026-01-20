@@ -1,56 +1,60 @@
+// --- 1. CONFIGURATION (Must be the absolute first lines) ---
+require('dotenv').config(); // Load variables before anything else
 const express = require('express');
-const cors = require('cors'); // Using the library for cleaner code
+const cors = require('cors'); 
 const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config();
 const pool = require('./src/db');
+
+// --- 2. DATA AUDIT (Check variables in Render logs) ---
+console.log("--- System Check ---");
+console.log("PORT:", process.env.PORT);
+console.log("SUPABASE_URL:", process.env.SUPABASE_URL ? "✅ Detected" : "❌ MISSING");
+console.log("DATABASE_URL:", process.env.DATABASE_URL ? "✅ Detected" : "❌ MISSING");
+console.log("--------------------");
 
 const app = express();
 
-// --- 1. GLOBAL MIDDLEWARE (The Security Layer) ---
+// --- 3. MIDDLEWARE (The Security Layer) ---
 
-// Manual CORS + Options handling to satisfy preflight checks
-
+// Health check for simple browser verification
 app.get('/debug', (req, res) => {
   res.json({ 
     status: 'online', 
     timestamp: new Date().toISOString(),
-    message: 'Data Pipeline is active' 
+    message: 'Data Pipeline is active',
+    env_check: {
+      supabase: !!process.env.SUPABASE_URL,
+      db: !!process.env.DATABASE_URL
+    }
   });
 });
 
-// Parse JSON bodies - Must be before routes!
 app.use((req, res, next) => {
-  // We use setHeader for better compatibility with Render's proxy
   res.setHeader('Access-Control-Allow-Origin', 'https://job-tracker-ai-virid.vercel.app');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-  // Handle the Preflight OPTIONS request explicitly
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
   next();
 });
+
 app.use(express.json());
 
-// --- 2. CLOUD & SERVICE INITIALIZATION ---
-if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
-    console.error("❌ CRITICAL ERROR: Supabase environment variables are missing!");
-}
+// --- 4. CLOUD INITIALIZATION ---
 
+// We initialize this AFTER the config check
 const supabase = createClient(
-    process.env.SUPABASE_URL, 
-    process.env.SUPABASE_ANON_KEY
+    process.env.SUPABASE_URL || 'https://placeholder.supabase.co', 
+    process.env.SUPABASE_ANON_KEY || 'placeholder'
 );
 
-
-
-// Use Memory Storage so Render's ephemeral disk doesn't lose files
 const upload = multer({ storage: multer.memoryStorage() });
 
 const transporter = nodemailer.createTransport({
@@ -61,7 +65,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// --- 3. AUTHENTICATION ROUTES (The Ingestion Gates) ---
+// --- 5. AUTHENTICATION ROUTES ---
 
 app.post('/api/auth/register', async (req, res) => {
   const { email, password } = req.body;
@@ -95,7 +99,7 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// --- 4. JOB & FILE MANAGEMENT (The Data Pipeline) ---
+// --- 6. JOB & FILE MANAGEMENT ---
 
 
 
@@ -107,7 +111,7 @@ app.post('/api/jobs', upload.fields([
   const client = await pool.connect();
   
   try {
-    await client.query('BEGIN'); // Atomic Transaction Start
+    await client.query('BEGIN'); 
 
     const jobRes = await client.query(
       `INSERT INTO jobs (user_id, role_name, company, job_url, job_description, status, reminder_enabled) 
@@ -172,7 +176,7 @@ app.put('/api/jobs/:jobId/status', async (req, res) => {
   } catch (err) { res.status(500).send("Server Error"); }
 });
 
-// --- 5. ORCHESTRATION (The Automated Trigger) ---
+// --- 7. AUTOMATION ---
 
 app.post('/api/reminders/send', async (req, res) => {
   const authHeader = req.headers.authorization;
@@ -199,9 +203,9 @@ app.post('/api/reminders/send', async (req, res) => {
   }
 });
 
-// --- 6. SERVER STARTUP ---
+// --- 8. STARTUP ---
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Data Pipeline Active on Port ${PORT}`);
 });
