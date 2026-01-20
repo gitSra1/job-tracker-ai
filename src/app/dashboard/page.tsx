@@ -19,6 +19,9 @@ export default function Dashboard() {
   const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
 
+  // Dynamic API URL for Data Pipeline
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
   // 3. Auth Guard & Initial Fetch
   useEffect(() => {
     const savedId = localStorage.getItem('userId');
@@ -32,10 +35,10 @@ export default function Dashboard() {
 
   const fetchUserJobs = async (uid: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/jobs/${uid}`);
+      const res = await fetch(`${API_BASE_URL}/api/jobs/${uid}`);
       if (res.ok) setJobs(await res.json());
     } catch (err) {
-      console.error("Failed to load jobs");
+      console.error("Data Pipeline Error: Failed to load history", err);
     }
   };
 
@@ -61,26 +64,25 @@ export default function Dashboard() {
     if (coverLetter) formData.append('coverLetter', coverLetter);
 
     try {
-      const response = await fetch('https://job-tracker-ai.onrender.com', {
+      // FIX: Added /api/jobs to the end of the Render URL
+      const response = await fetch(`${API_BASE_URL}/api/jobs`, {
         method: 'POST',
         body: formData, 
       });
 
       if (response.ok) {
-        alert("Application saved!");
+        alert("Application saved to cloud!");
         setRole(''); setCompany(''); setUrl(''); setDescription('');
         setStatus(''); setResume(null); setCoverLetter(null); setSetReminder(false);
         fetchUserJobs(userId!); 
       }
     } catch (err) {
-      alert("Connection to backend failed.");
+      alert("Connection to backend failed. Check if Render is awake.");
     }
   };
 
   return (
     <div className="dashboard-container">
-      {/* Navbar is now handled by the global Layout/Navbar component */}
-      
       <main className="dashboard-grid">
         <section className="form-section">
           <h2>Track New Opportunity</h2>
@@ -144,7 +146,7 @@ export default function Dashboard() {
               <div key={job.id} className="job-card">
                 <h3>{job.role_name}</h3>
                 <p>{job.company}</p>
-                <span className={`badge ${job.status}`}>{job.status}</span>
+                <span className={`badge ${job.status.replace(/\s+/g, '-').toLowerCase()}`}>{job.status}</span>
               </div>
             ))}
           </div>

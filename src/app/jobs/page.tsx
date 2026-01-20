@@ -9,6 +9,9 @@ export default function MyJobs() {
   const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
 
+  // Define the API base URL dynamically
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
   useEffect(() => {
     const savedId = localStorage.getItem('userId');
     if (!savedId) {
@@ -21,29 +24,33 @@ export default function MyJobs() {
 
   const fetchJobs = async (uid: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/jobs/${uid}`);
-      if (res.ok) setJobs(await res.json());
+      // Data Ingestion: Fetching from the cloud or local source
+      const res = await fetch(`${API_BASE_URL}/api/jobs/${uid}`);
+      if (res.ok) {
+        setJobs(await res.json());
+      }
     } catch (err) {
-      console.error("Failed to fetch jobs");
+      console.error("Data Pipeline Error: Failed to fetch jobs", err);
     }
   };
 
   const handleStatusChange = async (jobId: number, newStatus: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/jobs/${jobId}/status`, {
+      // Data Transformation: Updating the record status in the warehouse
+      const res = await fetch(`${API_BASE_URL}/api/jobs/${jobId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
 
       if (res.ok) {
-        // Instant UI update for better UX
+        // Instant UI update
         setJobs((prev: any) =>
           prev.map((job: any) => job.id === jobId ? { ...job, status: newStatus } : job)
         );
       }
     } catch (err) {
-      alert("Error updating status");
+      alert("Error updating status in cloud database");
     }
   };
 
@@ -53,8 +60,6 @@ export default function MyJobs() {
 
   return (
     <div className="jobs-container">
-      {/* Redundant nav removed - now handled by global Navbar component */}
-      
       <main className="jobs-content">
         <header className="jobs-header">
           <h1>My Applications</h1>
