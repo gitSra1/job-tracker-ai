@@ -13,20 +13,23 @@ const app = express();
 // --- 1. GLOBAL MIDDLEWARE (The Security Layer) ---
 
 // Manual CORS + Options handling to satisfy preflight checks
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://job-tracker-ai-virid.vercel.app");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true");
 
+
+// Parse JSON bodies - Must be before routes!
+app.use((req, res, next) => {
+  // We use setHeader for better compatibility with Render's proxy
+  res.setHeader('Access-Control-Allow-Origin', 'https://job-tracker-ai-virid.vercel.app');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  // Handle the Preflight OPTIONS request explicitly
   if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
+    return res.status(200).end();
   }
   next();
 });
-
-// Parse JSON bodies - Must be before routes!
-app.use(express.json()); 
+app.use(express.json());
 
 // --- 2. CLOUD & SERVICE INITIALIZATION ---
 
