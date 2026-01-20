@@ -39,8 +39,16 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 // --- 2. CLOUD & SERVICE INITIALIZATION ---
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+    console.error("❌ CRITICAL ERROR: Supabase environment variables are missing!");
+}
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+const supabase = createClient(
+    process.env.SUPABASE_URL, 
+    process.env.SUPABASE_ANON_KEY
+);
+
+
 
 // Use Memory Storage so Render's ephemeral disk doesn't lose files
 const upload = multer({ storage: multer.memoryStorage() });
