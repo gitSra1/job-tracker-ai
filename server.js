@@ -14,6 +14,13 @@ const app = express();
 
 // Manual CORS + Options handling to satisfy preflight checks
 
+app.get('/debug', (req, res) => {
+  res.json({ 
+    status: 'online', 
+    timestamp: new Date().toISOString(),
+    message: 'Data Pipeline is active' 
+  });
+});
 
 // Parse JSON bodies - Must be before routes!
 app.use((req, res, next) => {
