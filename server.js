@@ -11,7 +11,11 @@ const pool = require('./src/db');
 const app = express();
 
 // --- 1. Middleware & Cloud Setup ---
-app.use(cors()); 
+app.use(cors({
+  origin: ['https://job-tracker-ai-virid.vercel.app', 'http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 app.use(express.json()); 
 
 // Initialize Supabase Client for Cloud Storage
