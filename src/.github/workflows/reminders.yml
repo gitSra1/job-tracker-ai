@@ -1,0 +1,16 @@
+name: 12-Hour Job Reminder Orchestrator
+
+on:
+  schedule:
+    # Runs every 12 hours (00:00 and 12:00 UTC)
+    - cron: '0 */12 * * *'
+  workflow_dispatch: # Allows you to run it manually for testing
+
+jobs:
+  ping-reminder-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Reminder API
+        run: |
+          curl -X POST https://your-render-app-url.onrender.com/api/reminders/send \
+          -H "Authorization: Bearer ${{ secrets.REMINDER_SECRET }}"

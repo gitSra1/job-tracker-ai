@@ -1,23 +1,23 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-// The Pool handles multiple connections to the database efficiently
+// For Data Engineering, we use the connection string for better portability
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    // Required for Supabase and other cloud providers to encrypt the data pipeline
+    rejectUnauthorized: false 
+  }
 });
 
-// This helps us debug if the server successfully connects
+// Event listener for active monitoring of the data connection
 pool.on('connect', () => {
-  console.log('✅ Connected to the PostgreSQL database');
+  console.log('✅ Connected to the Supabase Cloud Database');
 });
 
-// If the database connection drops, this will alert us
+// Critical for Data Reliability: Alerts if the connection to the data store drops
 pool.on('error', (err) => {
-  console.error('❌ Unexpected error on idle database client', err);
+  console.error('❌ Data Pipeline Error: Unexpected error on idle client', err);
   process.exit(-1);
 });
 
