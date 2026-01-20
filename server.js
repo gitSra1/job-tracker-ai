@@ -12,10 +12,13 @@ const app = express();
 
 // --- 1. Middleware & Cloud Setup ---
 app.use(cors({
-  origin: ['https://job-tracker-ai-virid.vercel.app', 'http://localhost:3000'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  // This tells the browser: "Yes, I trust this Vercel site"
+  origin: 'https://job-tracker-ai-virid.vercel.app', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
+app.options('*', cors());
 app.use(express.json()); 
 
 // Initialize Supabase Client for Cloud Storage
